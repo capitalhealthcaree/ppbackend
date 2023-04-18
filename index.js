@@ -107,7 +107,7 @@ app.get("/appointment/getAll", async (req, res) => {
 // ...................................................For BLOGS..............
 //get all blogs
 app.get("/blogs/getAll", async (req, res) => {
-  let data = await Blog.find().limit(50);
+  let data = await Blog.find();
   if (data) {
     res.status(200).json({ data });
   } else {
