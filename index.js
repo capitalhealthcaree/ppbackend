@@ -106,14 +106,14 @@ app.get("/appointment/getAll", async (req, res) => {
 });
 // ...................................................For BLOGS..............
 //get all blogs
-// app.get("/blogs/getAll", async (req, res) => {
-//   let data = await Blog.find();
-//   if (data) {
-//     res.status(200).json({ data });
-//   } else {
-//     res.status(500).json({ err: "getting some error" });
-//   }
-// });
+app.get("/blogs/getAll", async (req, res) => {
+  let data = await Blog.find();
+  if (data) {
+    res.status(200).json({ data });
+  } else {
+    res.status(500).json({ err: "getting some error" });
+  }
+});
 // get last three blogs
 app.get("/blogs/getLastThree", async (req, res) => {
   try {
@@ -263,14 +263,17 @@ app.post("/news/create", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-// app.get("/news/getAll", async (req, res) => {
-//   let data = await News.find();
-//   if (data) {
-//     res.status(200).json({ data });
-//   } else {
-//     res.status(500).json({ err: "getting some error" });
-//   }
-// });
+
+// get all news
+
+app.get("/news/getAll", async (req, res) => {
+  let data = await News.find();
+  if (data) {
+    res.status(200).json({ data });
+  } else {
+    res.status(500).json({ err: "getting some error" });
+  }
+});
 
 // get all news by pagination
 app.get("/news/getAll/pagination", async (req, res) => {
