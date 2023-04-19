@@ -114,7 +114,25 @@ app.get("/blogs/getAll", async (req, res) => {
     res.status(500).json({ err: "getting some error" });
   }
 });
+// get all blogs by pagination
+app.get("/blogs/getAll/pagination", async (req, res) => {
+  const page = parseInt(req.query.page) || 1; // default to first page if page is not specified
+  const limit = parseInt(req.query.limit) || 30; // default to 10 documents per page if limit is not specified
+  const startIndex = (page - 1) * limit;
 
+  try {
+    const totalDocs = await Blog.countDocuments();
+    const data = await Blog.find().skip(startIndex).limit(limit);
+
+    res.status(200).json({
+      currentPage: page,
+      totalPages: Math.ceil(totalDocs / limit),
+      data
+    });
+  } catch (err) {
+    res.status(500).json({ err: "getting some error" });
+  }
+});
 // get single blog by id
 app.get("/blogs/id/:id", async (req, res) => {
   try {
