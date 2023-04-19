@@ -10,7 +10,7 @@ const News = require("./model/News");
 const Appointment = require("./model/appointment");
 
 app.use(cors());
-
+//
 app.use(express.json());
 
 mongoose.connect(
