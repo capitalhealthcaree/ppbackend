@@ -115,7 +115,7 @@ app.get("/appointment/getAll", async (req, res) => {
 //   }
 // });
 // get last three blogs
-app.get("/news/getLastThree", async (req, res) => {
+app.get("/blogs/getLastThree", async (req, res) => {
   try {
     const data = await Blog.find().sort({ _id: -1 }).limit(3);
     res.status(200).json({ data });
