@@ -106,18 +106,18 @@ app.get("/appointment/getAll", async (req, res) => {
 });
 // ...................................................For BLOGS..............
 //get all blogs
-app.get("/blogs/getAll", async (req, res) => {
-  let data = await Blog.find();
-  if (data) {
-    res.status(200).json({ data });
-  } else {
-    res.status(500).json({ err: "getting some error" });
-  }
-});
+// app.get("/blogs/getAll", async (req, res) => {
+//   let data = await Blog.find();
+//   if (data) {
+//     res.status(200).json({ data });
+//   } else {
+//     res.status(500).json({ err: "getting some error" });
+//   }
+// });
 // get all blogs by pagination
 app.get("/blogs/getAll/pagination", async (req, res) => {
   const page = parseInt(req.query.page) || 1; // default to first page if page is not specified
-  const limit = parseInt(req.query.limit) || 30; // default to 10 documents per page if limit is not specified
+  const limit = parseInt(req.query.limit) || 21; // default to 10 documents per page if limit is not specified
   const startIndex = (page - 1) * limit;
 
   try {
@@ -254,14 +254,35 @@ app.post("/news/create", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-app.get("/news/getAll", async (req, res) => {
-  let data = await News.find();
-  if (data) {
-    res.status(200).json({ data });
-  } else {
+// app.get("/news/getAll", async (req, res) => {
+//   let data = await News.find();
+//   if (data) {
+//     res.status(200).json({ data });
+//   } else {
+//     res.status(500).json({ err: "getting some error" });
+//   }
+// });
+
+// get all news by pagination
+app.get("/news/getAll/pagination", async (req, res) => {
+  const page = parseInt(req.query.page) || 1; // default to first page if page is not specified
+  const limit = parseInt(req.query.limit) || 21; // default to 10 documents per page if limit is not specified
+  const startIndex = (page - 1) * limit;
+
+  try {
+    const totalDocs = await News.countDocuments();
+    const data = await News.find().skip(startIndex).limit(limit);
+
+    res.status(200).json({
+      currentPage: page,
+      totalPages: Math.ceil(totalDocs / limit),
+      data
+    });
+  } catch (err) {
     res.status(500).json({ err: "getting some error" });
   }
 });
+
 app.delete("/news/:blogId", async (req, res) => {
   try {
     let deleted = await News.deleteOne({
