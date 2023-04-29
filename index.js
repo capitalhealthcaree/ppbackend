@@ -1,5 +1,4 @@
 const express = require("express");
-const app = express();
 const appPort = 5000;
 const mongoose = require("mongoose");
 const mongodb = require("mongodb");
@@ -9,10 +8,14 @@ const Blog = require("./model/Blogs");
 const News = require("./model/News");
 const Appointment = require("./model/appointment");
 
-app.use(express.json());
+const app = express();
+
+app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
-app.use(cors());
+
+app.use(express.json());
+
 
 mongoose.connect(
   "mongodb+srv://ppbackend:Web786786@healthcarecluster.yhawahg.mongodb.net/priemerpaindb?retryWrites=true&w=majority"
