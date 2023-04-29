@@ -9,10 +9,11 @@ const Blog = require("./model/Blogs");
 const News = require("./model/News");
 const Appointment = require("./model/appointment");
 
-app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+app.use(cors());
+
 mongoose.connect(
   "mongodb+srv://ppbackend:Web786786@healthcarecluster.yhawahg.mongodb.net/priemerpaindb?retryWrites=true&w=majority"
 );
