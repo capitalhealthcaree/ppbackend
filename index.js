@@ -1,4 +1,5 @@
 const express = require("express");
+const bodyParser = require('body-parser');
 const appPort = 5000;
 const mongoose = require("mongoose");
 const mongodb = require("mongodb");
