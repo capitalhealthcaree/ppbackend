@@ -60,7 +60,7 @@ app.post("/appointment/create", async (req, res) => {
     service: "gmail",
     auth: {
       user: "webdevelopercapital@gmail.com",
-      pass: "ulgfizctvtqktylr",
+      pass: "uvgqevylpebrtvgj",
     },
   });
 
