@@ -1,5 +1,5 @@
 const express = require("express");
-const bodyParser = require('body-parser');
+const bodyParser = require("body-parser");
 const appPort = 5000;
 const mongoose = require("mongoose");
 const mongodb = require("mongodb");
@@ -8,12 +8,13 @@ const cors = require("cors");
 const Blog = require("./model/Blogs");
 const News = require("./model/News");
 const Appointment = require("./model/appointment");
+const Faq = require("./model/Faq");
 
 const app = express();
 
 app.use(cors());
-app.use(bodyParser.json({ limit: '50mb' }));
-app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
 app.use(express.json());
 
@@ -141,7 +142,7 @@ app.get("/blogs/getAll/pagination", async (req, res) => {
     res.status(200).json({
       currentPage: page,
       totalPages: Math.ceil(totalDocs / limit),
-      data
+      data,
     });
   } catch (err) {
     res.status(500).json({ err: "getting some error" });
@@ -191,7 +192,7 @@ app.get("/blogs/:category/:slug", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
+// create blog
 app.post("/blogs/create", async (req, res) => {
   try {
     let result = await Blog.create({
@@ -293,7 +294,7 @@ app.get("/news/getAll/pagination", async (req, res) => {
     res.status(200).json({
       currentPage: page,
       totalPages: Math.ceil(totalDocs / limit),
-      data
+      data,
     });
   } catch (err) {
     res.status(500).json({ err: "getting some error" });
@@ -365,7 +366,144 @@ app.get("/news/id/:id", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-//Server
+// ...................................................For FAQs..............
+//get all faqs
+app.get("/faq/getAll", async (req, res) => {
+  let data = await Faq.find();
+  if (data) {
+    res.status(200).json({ data });
+  } else {
+    res.status(500).json({ err: "getting some error" });
+  }
+});
+// get last three blogs
+// app.get("/blogs/getLastThree", async (req, res) => {
+//   try {
+//     const data = await Blog.find().sort({ _id: -1 }).limit(3);
+//     res.status(200).json({ data });
+//   } catch (err) {
+//     res.status(500).json({ err: "error getting blogs" });
+//   }
+// });
+// get all blogs by pagination
+// app.get("/blogs/getAll/pagination", async (req, res) => {
+//   const page = parseInt(req.query.page) || 1; // default to first page if page is not specified
+//   const limit = parseInt(req.query.limit) || 21; // default to 10 documents per page if limit is not specified
+//   const startIndex = (page - 1) * limit;
+
+//   try {
+//     const totalDocs = await Blog.countDocuments();
+//     const data = await Blog.find().skip(startIndex).limit(limit);
+
+//     res.status(200).json({
+//       currentPage: page,
+//       totalPages: Math.ceil(totalDocs / limit),
+//       data,
+//     });
+//   } catch (err) {
+//     res.status(500).json({ err: "getting some error" });
+//   }
+// });
+// get single blog by id
+// app.get("/blogs/id/:id", async (req, res) => {
+//   try {
+//     const blog = await Blog.findById(req.params.id);
+//     if (!blog) {
+//       return res.status(404).json({ error: "Blog not found" });
+//     }
+//     res.status(200).json({ data: blog });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+//filte by category
+//BackPain LegPain NeckPain JointPain ShoulderPain News Treatments InjuryTreatment
+// app.get("/blogs/getByCategory", async (req, res) => {
+//   try {
+//     let category = req.query.category;
+//     let result = await Blog.aggregate([
+//       { $match: { category: new RegExp(category, "i") } },
+//     ]);
+//     res.status(200).json({ data: result, mesasge: "get blogs by category" });
+//   } catch (error) {
+//     res.status(500).json({ err: error.message });
+//   }
+// });
+
+// get single faq by slug
+app.get("/faq/:slug", async (req, res) => {
+  try {
+    let slugs = "/" + req.params.slug + "/";
+    const faq = await Faq.findOne({
+      slug: slugs,
+    });
+    if (!faq) {
+      return res.status(404).json({ error: "Faq not found" });
+    }
+    res.status(200).json({ data: faq });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+});
+// create faq
+app.post("/faq/create", async (req, res) => {
+  try {
+    let result = await Faq.create({
+      question: req.body.question,
+      answer: req.body.answer,
+      metaDes: req.body.metaDes,
+      foucKW: req.body.foucKW,
+      slug: req.body.slug,
+      seoTitle: req.body.seoTitle,
+    });
+    res
+      .status(200)
+      .json({ data: result, mesasge: "Faq is created successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+// delete Faq
+app.delete("/faq/:faqId", async (req, res) => {
+  try {
+    let deleted = await Faq.deleteOne({
+      _id: new mongodb.ObjectId(req.params.faqId),
+    });
+    res
+      .status(200)
+      .json({ data: deleted, mesasge: "Faq deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+//update Faq
+app.patch("/faq/update/:faqId", async (req, res) => {
+  try {
+    let id = req.params.faqId;
+
+    let faq = await Faq.updateOne(
+      { _id: id },
+      {
+        $set: {
+          question: req.body.question,
+          answer: req.body.answer,
+          metaDes: req.body.metaDes,
+          foucKW: req.body.foucKW,
+          slug: req.body.slug,
+          seoTitle: req.body.seoTitle,
+        },
+      }
+    );
+
+    res.status(200).json({ mesasge: "Faq updated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+//..................................................................Server
 app.listen(appPort, () => {
   console.log(`Server running at http://localhost/:${appPort}/`);
 });
