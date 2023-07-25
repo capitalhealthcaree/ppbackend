@@ -128,6 +128,15 @@ app.get("/blogs/getLastThree", async (req, res) => {
     res.status(500).json({ err: "error getting blogs" });
   }
 });
+// get last five blogs
+app.get("blogs/getLastFive", async (req, res) => {
+  try {
+    const data = await Blog.find().sort({ _id: -1 }).limit(5);
+    res.status(200).json({ data });
+  } catch (err) {
+    res.status(500).json({ err: "error getting blogs" });
+  }
+});
 // get all blogs by pagination
 app.get("/blogs/getAll/pagination", async (req, res) => {
   const page = parseInt(req.query.page) || 1; // default to first page if page is not specified
