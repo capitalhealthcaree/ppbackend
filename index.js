@@ -18,7 +18,6 @@ app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
 app.use(express.json());
 
-
 mongoose.connect(
   "mongodb+srv://ppbackend:Web786786@healthcarecluster.yhawahg.mongodb.net/priemerpaindb?retryWrites=true&w=majority"
 );
@@ -137,7 +136,10 @@ app.get("/blogs/getAll/pagination", async (req, res) => {
 
   try {
     const totalDocs = await Blog.countDocuments();
-    const data = await Blog.find().sort({ _id: -1 }).skip(startIndex).limit(limit);
+    const data = await Blog.find()
+      .sort({ _id: -1 })
+      .skip(startIndex)
+      .limit(limit);
 
     res.status(200).json({
       currentPage: page,
@@ -284,12 +286,15 @@ app.get("/news/getAll", async (req, res) => {
 // get all news by pagination
 app.get("/news/getAll/pagination", async (req, res) => {
   const page = parseInt(req.query.page) || 1; // default to first page if page is not specified
-  const limit = parseInt(req.query.limit) || 15; // default to 10 documents per page if limit is not specified
+  const limit = parseInt(req.query.limit) || 12; // default to 10 documents per page if limit is not specified
   const startIndex = (page - 1) * limit;
 
   try {
     const totalDocs = await News.countDocuments();
-    const data = await News.find().skip(startIndex).limit(limit);
+    const data = await News.find()
+      .sort({ _id: -1 })
+      .skip(startIndex)
+      .limit(limit);
 
     res.status(200).json({
       currentPage: page,
