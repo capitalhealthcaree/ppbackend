@@ -295,7 +295,7 @@ app.get("/news/getAll", async (req, res) => {
 // get all news by pagination
 app.get("/news/getAll/pagination", async (req, res) => {
   const page = parseInt(req.query.page) || 1; // default to first page if page is not specified
-  const limit = parseInt(req.query.limit) || 12; // default to 10 documents per page if limit is not specified
+  const limit = parseInt(req.query.limit) || 9; // default to 10 documents per page if limit is not specified
   const startIndex = (page - 1) * limit;
 
   try {
