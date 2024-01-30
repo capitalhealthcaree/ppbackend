@@ -563,6 +563,58 @@ app.get("/counters", async (req, res) => {
   }
 });
 
+//get Counter Date Wise
+app.get("/countersDateWise", async (req, res) => {
+  try {
+    const count = await Count.find();
+
+    // Group data by date
+    const groupedByDate = count.reduce((acc, curr) => {
+      const date = new Date(curr.createdAt).toLocaleDateString("en-US", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
+      if (!acc[date]) {
+        acc[date] = [];
+      }
+      acc[date].push(curr);
+      return acc;
+    }, {});
+
+    // Transform grouped data into desired format
+    const transformedData = Object.entries(groupedByDate).map(
+      ([date, items]) => {
+        const totalCounts = items.reduce((total, item) => {
+          const existingItem = total.find((t) => t.kw === item.kw);
+          if (existingItem) {
+            existingItem.totalCount += item.count;
+          } else {
+            total.push({ kw: item.kw, totalCount: item.count });
+          }
+          return total;
+        }, []);
+
+        // Calculate overall total count for the date
+        const overallTotalCount = totalCounts.reduce(
+          (total, item) => total + item.totalCount,
+          0
+        );
+
+        return {
+          date,
+          totalCounts,
+          overallTotalCount,
+        };
+      }
+    );
+
+    return res.status(200).json({ data: transformedData });
+  } catch (error) {
+    console.error("Error retrieving count:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 //get Counter by Date
 app.get("/counter/:date", async (req, res) => {
   try {
