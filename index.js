@@ -6,6 +6,7 @@ const mongodb = require("mongodb");
 const nodemailer = require("nodemailer");
 const cors = require("cors");
 const Blog = require("./model/Blogs");
+const Count = require("./model/Counter");
 const News = require("./model/News");
 const Appointment = require("./model/appointment");
 const Faq = require("./model/Faq");
@@ -525,6 +526,64 @@ app.patch("/faq/update/:faqId", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+//post Counter
+app.post("/counter", async (req, res) => {
+  try {
+    const { count, kw } = req.body;
+
+    // Create a new Count document
+    const counter = new Count({ count, kw });
+
+    // Save the count to the database
+    await counter.save();
+
+    // Send a success response
+    res.status(201).json({ message: "Count saved successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+//get Counter
+app.get("/counters", async (req, res) => {
+  try {
+    const count = await Count.find();
+
+    if (!count) {
+      return res
+        .status(404)
+        .json({ error: "Count not found for the requested date" });
+    }
+
+    res.json({ kw: count.kw, counter: count.count });
+  } catch (error) {
+    console.error("Error retrieving count:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+//get Counter by Date
+app.get("/counter/:date", async (req, res) => {
+  try {
+    const requestedDate = new Date(req.params.date);
+
+    // Get the counts for the requested date
+    const count = await Count.findOne({ date: requestedDate });
+
+    if (!count) {
+      return res
+        .status(404)
+        .json({ error: "Count not found for the requested date" });
+    }
+
+    res.json({ date: count.date, count: count.count });
+  } catch (error) {
+    console.error("Error retrieving count:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 //..................................................................Server
 app.listen(appPort, () => {
   console.log(`Server running at http://localhost/:${appPort}/`);
