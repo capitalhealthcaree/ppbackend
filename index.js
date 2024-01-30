@@ -556,7 +556,7 @@ app.get("/counters", async (req, res) => {
         .json({ error: "Count not found for the requested date" });
     }
 
-    res.json({ kw: count.kw, counter: count.count });
+    res.json({ count });
   } catch (error) {
     console.error("Error retrieving count:", error);
     res.status(500).json({ error: "Internal Server Error" });
