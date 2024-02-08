@@ -103,7 +103,7 @@ app.post("/appointment/create", async (req, res) => {
 });
 //get all appointments
 app.get("/appointment/getAll", async (req, res) => {
-  let data = await Appointment.find();
+  let data = await Appointment.find().sort({ createdAt: -1 });
   if (data) {
     res.status(200).json({ data });
   } else {
