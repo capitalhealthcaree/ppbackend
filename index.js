@@ -10,6 +10,7 @@ const Count = require("./model/Counter");
 const News = require("./model/News");
 const Appointment = require("./model/appointment");
 const Faq = require("./model/Faq");
+const ChatID = require("./model/ChatID");
 
 const app = express();
 //....
@@ -34,6 +35,49 @@ db.on("disconnected", (err, res) => {
 app.get("/", async (req, res) => {
   res.send("Welcome");
 });
+
+//......................... ChatID ..........................
+app.post("/chatId/create", async (req, res) => {
+  try {
+    let result = await ChatID.create({
+      chatIdKey: req.body.chatIdKey,
+    });
+    res
+      .status(200)
+      .json({ data: result, mesasge: "chatIdKey is addedd successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+//......update chat id
+app.patch("/chatId/update/:chatbotId", async (req, res) => {
+  try {
+    let id = req.params.chatbotId;
+
+    let blog = await ChatID.updateOne(
+      { _id: id },
+      {
+        $set: {
+          chatIdKey: req.body.chatIdKey,
+        },
+      }
+    );
+
+    res.status(200).json({ mesasge: "Blog updated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+//......get chat id
+app.get("/chatId/get", async (req, res) => {
+  let data = await ChatID.find();
+  if (data) {
+    res.status(200).json({ data });
+  } else {
+    res.status(500).json({ err: "getting some error" });
+  }
+});
+
 //................................................Appointment............
 
 app.post("/appointment/create", async (req, res) => {
