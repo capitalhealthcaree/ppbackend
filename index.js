@@ -726,6 +726,22 @@ app.get("/treatments/:slug", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+// delete Treatments specific page content
+app.delete("/treatments/:treatmentsId", async (req, res) => {
+  try {
+    let deleted = await Treatments.deleteOne({
+      _id: new mongodb.ObjectId(req.params.treatmentsId),
+    });
+    res
+      .status(200)
+      .json({
+        data: deleted,
+        mesasge: "Treatments specific page content deleted successfully",
+      });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 //..................................................................Server
 app.listen(appPort, () => {
