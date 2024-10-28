@@ -707,11 +707,8 @@ app.get("/treatments/getAll", async (req, res) => {
 // Get single treatment content page by slug
 app.get("/treatments/:slug", async (req, res) => {
   try {
-    // Ensure the slug format is correct
-    const slugs = `/${req.params.slug}/`;
-
     // Find the treatment by slug
-    const treatment = await Treatments.findOne({ slug: slugs });
+    const treatment = await Treatments.findOne({ slug: req.params.slug });
 
     // Check if the treatment exists
     if (!treatment) {
@@ -732,12 +729,10 @@ app.delete("/treatments/:treatmentsId", async (req, res) => {
     let deleted = await Treatments.deleteOne({
       _id: new mongodb.ObjectId(req.params.treatmentsId),
     });
-    res
-      .status(200)
-      .json({
-        data: deleted,
-        mesasge: "Treatments specific page content deleted successfully",
-      });
+    res.status(200).json({
+      data: deleted,
+      mesasge: "Treatments specific page content deleted successfully",
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
