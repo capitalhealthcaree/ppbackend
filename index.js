@@ -695,18 +695,31 @@ app.post("/treatments/create", async (req, res) => {
   }
 });
 
-// get single treatments content page by slug
+// Get all  treatment content pages
+app.get("/treatments/getAll", async (req, res) => {
+  let data = await Treatments.find();
+  if (data) {
+    res.status(200).json({ data });
+  } else {
+    res.status(500).json({ err: "getting some error" });
+  }
+});
+// Get single treatment content page by slug
 app.get("/treatments/:slug", async (req, res) => {
   try {
-    let slugs = "/" + req.params.slug + "/";
-    const treatment = await Treatments.findOne({
-      slug: slugs,
-    });
+    // Ensure the slug format is correct
+    const slugs = `/${req.params.slug}/`;
+
+    // Find the treatment by slug
+    const treatment = await Treatments.findOne({ slug: slugs });
+
+    // Check if the treatment exists
     if (!treatment) {
       return res
         .status(404)
-        .json({ error: "single treatments content page not found" });
+        .json({ error: "Single treatment content page not found" });
     }
+    // Return the found treatment
     res.status(200).json({ data: treatment });
   } catch (error) {
     console.error(error);
@@ -716,5 +729,5 @@ app.get("/treatments/:slug", async (req, res) => {
 
 //..................................................................Server
 app.listen(appPort, () => {
-  console.log(`Server running at http://localhost/:${appPort}/`);
+  console.log(`Server running at http://localhost:${appPort}/`);
 });
