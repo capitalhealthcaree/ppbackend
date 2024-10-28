@@ -11,6 +11,7 @@ const News = require("./model/News");
 const Appointment = require("./model/appointment");
 const Faq = require("./model/Faq");
 const ChatID = require("./model/ChatID");
+const Treatments = require("./model/Treatments");
 
 const app = express();
 //....
@@ -677,6 +678,39 @@ app.get("/counter/:date", async (req, res) => {
   } catch (error) {
     console.error("Error retrieving count:", error);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+// create treatments page content
+app.post("/treatments/create", async (req, res) => {
+  try {
+    let result = await Treatments.create({
+      content: req.body.content,
+      slug: req.body.slug,
+    });
+    res
+      .status(200)
+      .json({ data: result, mesasge: "treatments is created successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// get single treatments content page by slug
+app.get("/treatments/:slug", async (req, res) => {
+  try {
+    let slugs = "/" + req.params.slug + "/";
+    const treatment = await Treatments.findOne({
+      slug: slugs,
+    });
+    if (!treatment) {
+      return res
+        .status(404)
+        .json({ error: "single treatments content page not found" });
+    }
+    res.status(200).json({ data: treatment });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
   }
 });
 
