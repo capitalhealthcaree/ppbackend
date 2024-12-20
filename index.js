@@ -64,6 +64,28 @@ app.get("/allAssets", async (req, res) => {
   }
 });
 
+app.get("/getAssetsGrouped", async (req, res) => {
+  try {
+    // Fetch all the assets from the database
+    const assets = await Assets.find();
+
+    // Group assets by folderName
+    const groupedAssets = assets.reduce((group, asset) => {
+      const { folderName } = asset;
+      if (!group[folderName]) {
+        group[folderName] = [];
+      }
+      group[folderName].push(asset);
+      return group;
+    }, {});
+
+    res.status(200).json({ data: groupedAssets, message: "Assets grouped successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
 //...... get Assets with no folderName
 app.get("/getAssetsWithoutFolder", async (req, res) => {
   try {
