@@ -12,6 +12,7 @@ const Appointment = require("./model/appointment");
 const Faq = require("./model/Faq");
 const ChatID = require("./model/ChatID");
 const Treatments = require("./model/Treatments");
+const Assets = require("./model/Assets");
 
 const app = express();
 //....
@@ -35,6 +36,56 @@ db.on("disconnected", (err, res) => {
 
 app.get("/", async (req, res) => {
   res.send("Welcome");
+});
+
+//......................... Assets ..........................
+app.post("/createAssets", async (req, res) => {
+  try {
+    let result = await Assets.create({
+      folderName: req.body.folderName,
+      fileName: req.body.fileName,
+      filePath: req.body.filePath,
+    });
+    res
+      .status(200)
+      .json({ data: result, mesasge: "Assets is addedd successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+//...... get Assets with no folderName
+app.get("/getAssetsWithoutFolder", async (req, res) => {
+  try {
+    let data = await Assets.find(
+      { folderName: "" },
+      { filepath: 1, filename: 1, folderName: 1 } // Projecting the fields
+    );
+    if (data.length > 0) {
+      res.status(200).json({ data });
+    } else {
+      res.status(404).json({ err: "No assets found" });
+    }
+  } catch (error) {
+    res.status(500).json({ err: "getting some error" });
+  }
+});
+
+//...... get Assets
+app.get("/getAssets", async (req, res) => {
+  try {
+    let data = await Assets.find(
+      { folderName: { $ne: "" } },
+      { filepath: 1, filename: 1, folderName: 1 } // Projecting the fields
+    );
+    if (data.length > 0) {
+      res.status(200).json({ data });
+    } else {
+      res.status(404).json({ err: "No assets found" });
+    }
+  } catch (error) {
+    res.status(500).json({ err: "getting some error" });
+  }
 });
 
 //......................... ChatID ..........................
