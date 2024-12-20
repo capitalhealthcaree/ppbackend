@@ -92,12 +92,28 @@ app.get("/getAssetsWithEmptyFolderName", async (req, res) => {
     // Fetch assets with an empty folderName
     const assets = await Assets.find({ folderName: "" });
 
-    res
-      .status(200)
-      .json({
-        data: assets,
-        message: "Assets with empty folderName fetched successfully",
-      });
+    res.status(200).json({
+      data: assets,
+      message: "Assets with empty folderName fetched successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.delete("/deleteAsset/:id", async (req, res) => {
+  try {
+    // Get the asset ID from the URL parameter
+    const assetId = req.params.id;
+
+    // Find the asset by ID and delete it
+    const result = await Assets.findByIdAndDelete(assetId);
+
+    if (!result) {
+      return res.status(404).json({ message: "Asset not found" });
+    }
+
+    res.status(200).json({ message: "Asset deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
