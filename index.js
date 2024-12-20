@@ -54,6 +54,16 @@ app.post("/createAssets", async (req, res) => {
   }
 });
 
+//......get all Assets
+app.get("/allAssets", async (req, res) => {
+  let data = await Assets.find();
+  if (data) {
+    res.status(200).json({ data });
+  } else {
+    res.status(500).json({ err: "getting some error" });
+  }
+});
+
 //...... get Assets with no folderName
 app.get("/getAssetsWithoutFolder", async (req, res) => {
   try {
