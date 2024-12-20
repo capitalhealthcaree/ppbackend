@@ -79,44 +79,27 @@ app.get("/getAssetsGrouped", async (req, res) => {
       return group;
     }, {});
 
-    res.status(200).json({ data: groupedAssets, message: "Assets grouped successfully" });
+    res
+      .status(200)
+      .json({ data: groupedAssets, message: "Assets grouped successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
-
-//...... get Assets with no folderName
-app.get("/getAssetsWithoutFolder", async (req, res) => {
+app.get("/getAssetsWithEmptyFolderName", async (req, res) => {
   try {
-    let data = await Assets.find(
-      { folderName: "" },
-      { filepath: 1, filename: 1, folderName: 1 } // Projecting the fields
-    );
-    if (data.length > 0) {
-      res.status(200).json({ data });
-    } else {
-      res.status(404).json({ err: "No assets found" });
-    }
-  } catch (error) {
-    res.status(500).json({ err: "getting some error" });
-  }
-});
+    // Fetch assets with an empty folderName
+    const assets = await Assets.find({ folderName: "" });
 
-//...... get Assets
-app.get("/getAssets", async (req, res) => {
-  try {
-    let data = await Assets.find(
-      { folderName: { $ne: "" } },
-      { filepath: 1, filename: 1, folderName: 1 } // Projecting the fields
-    );
-    if (data.length > 0) {
-      res.status(200).json({ data });
-    } else {
-      res.status(404).json({ err: "No assets found" });
-    }
+    res
+      .status(200)
+      .json({
+        data: assets,
+        message: "Assets with empty folderName fetched successfully",
+      });
   } catch (error) {
-    res.status(500).json({ err: "getting some error" });
+    res.status(500).json({ message: error.message });
   }
 });
 
