@@ -74,8 +74,11 @@ app.get("/getAssetsGrouped", async (req, res) => {
     // Fetch all the assets from the database
     const assets = await Assets.find();
 
+    // Filter out assets where folderName is an empty string
+    const filteredAssets = assets.filter(asset => asset.folderName !== "");
+
     // Group assets by folderName
-    const groupedAssets = assets.reduce((group, asset) => {
+    const groupedAssets = filteredAssets.reduce((group, asset) => {
       const { folderName } = asset;
       if (!group[folderName]) {
         group[folderName] = [];
@@ -91,6 +94,30 @@ app.get("/getAssetsGrouped", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+
+// app.get("/getAssetsGrouped", async (req, res) => {
+//   try {
+//     // Fetch all the assets from the database
+//     const assets = await Assets.find();
+
+//     // Group assets by folderName
+//     const groupedAssets = assets.reduce((group, asset) => {
+//       const { folderName } = asset;
+//       if (!group[folderName]) {
+//         group[folderName] = [];
+//       }
+//       group[folderName].push(asset);
+//       return group;
+//     }, {});
+
+//     res
+//       .status(200)
+//       .json({ data: groupedAssets, message: "Assets grouped successfully" });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// });
 
 app.get("/getAssetsWithEmptyFolderName", async (req, res) => {
   try {
