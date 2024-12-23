@@ -133,58 +133,58 @@ app.get("/getAssetsWithEmptyFolderName", async (req, res) => {
   }
 });
 
-// app.delete("/deleteAsset/:id", async (req, res) => {
-//   try {
-//     // Get the asset ID from the URL parameter
-//     const assetId = req.params.id;
-
-//     // Find the asset in the database
-//     const asset = await Assets.findById(assetId);
-
-//     if (!asset) {
-//       return res.status(404).json({ message: "Asset not found" });
-//     }
-
-//     // Deleting the asset from Cloudinary using the public_id
-//     if (asset.filePath) {
-//       // Extract the public_id from the filePath (assuming filePath contains the URL from Cloudinary)
-//       const publicId = asset.filePath.split("/").pop().split(".")[0]; // Assuming URL format
-
-//       // Call Cloudinary to delete the image
-//       const cloudinaryResponse = await cloudinary.uploader.destroy(publicId);
-
-//       if (cloudinaryResponse.result !== "ok") {
-//         return res
-//           .status(500)
-//           .json({ message: "Error deleting image from Cloudinary" });
-//       }
-//     }
-
-//     // Delete the asset from the database
-//     await Assets.findByIdAndDelete(assetId);
-
-//     res.status(200).json({ message: "Asset and image deleted successfully" });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// });
 app.delete("/deleteAsset/:id", async (req, res) => {
   try {
     // Get the asset ID from the URL parameter
     const assetId = req.params.id;
 
-    // Find the asset by ID and delete it
-    const result = await Assets.findByIdAndDelete(assetId);
+    // Find the asset in the database
+    const asset = await Assets.findById(assetId);
 
-    if (!result) {
+    if (!asset) {
       return res.status(404).json({ message: "Asset not found" });
     }
 
-    res.status(200).json({ message: "Asset deleted successfully" });
+    // Deleting the asset from Cloudinary using the public_id
+    if (asset.filePath) {
+      // Extract the public_id from the filePath (assuming filePath contains the URL from Cloudinary)
+      const publicId = asset.filePath.split("/").pop().split(".")[0]; // Assuming URL format
+
+      // Call Cloudinary to delete the image
+      const cloudinaryResponse = await cloudinary.uploader.destroy(publicId);
+
+      if (cloudinaryResponse.result !== "ok") {
+        return res
+          .status(500)
+          .json({ message: "Error deleting image from Cloudinary" });
+      }
+    }
+
+    // Delete the asset from the database
+    await Assets.findByIdAndDelete(assetId);
+
+    res.status(200).json({ message: "Asset and image deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
+// app.delete("/deleteAsset/:id", async (req, res) => {
+//   try {
+//     // Get the asset ID from the URL parameter
+//     const assetId = req.params.id;
+
+//     // Find the asset by ID and delete it
+//     const result = await Assets.findByIdAndDelete(assetId);
+
+//     if (!result) {
+//       return res.status(404).json({ message: "Asset not found" });
+//     }
+
+//     res.status(200).json({ message: "Asset deleted successfully" });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// });
 
 //......................... ChatID ..........................
 app.post("/chatId/create", async (req, res) => {
