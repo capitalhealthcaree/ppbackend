@@ -75,7 +75,7 @@ app.get("/getAssetsGrouped", async (req, res) => {
     const assets = await Assets.find();
 
     // Filter out assets where folderName is an empty string
-    const filteredAssets = assets.filter(asset => asset.folderName !== "");
+    const filteredAssets = assets.filter((asset) => asset.folderName !== "");
 
     // Group assets by folderName
     const groupedAssets = filteredAssets.reduce((group, asset) => {
@@ -94,7 +94,6 @@ app.get("/getAssetsGrouped", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-
 
 // app.get("/getAssetsGrouped", async (req, res) => {
 //   try {
@@ -887,6 +886,25 @@ app.delete("/treatments/:treatmentsId", async (req, res) => {
   }
 });
 
+//update treatments specific page content api
+app.patch("/treatmentsUpdate/:treatmentsId", async (req, res) => {
+  try {
+    let id = req.params.treatmentsId;
+
+    let treatments = await Treatments.updateOne(
+      { _id: id },
+      {
+        $set: {
+          content: req.body.content,
+          slug: req.body.slug,
+        },
+      }
+    );
+    res.status(200).json({ mesasge: "treatments updated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 //..................................................................Server
 app.listen(appPort, () => {
   console.log(`Server running at http://localhost:${appPort}/`);
