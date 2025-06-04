@@ -306,6 +306,23 @@ app.get("/appointment/getAll", async (req, res) => {
     res.status(500).json({ err: "getting some error" });
   }
 });
+// delete specific appointment
+app.delete("/deleteAppointment/:appointmentId", async (req, res) => {
+  try {
+    let deleted = await Appointment.deleteOne({
+      _id: new mongodb.ObjectId(req.params.appointmentId),
+    });
+    res
+      .status(200)
+      .json({
+        data: deleted,
+        mesasge: "Specific Appointment deleted successfully",
+      });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // ...................................................For BLOGS..............
 //get all blogs
 app.get("/blogs/getAll", async (req, res) => {
