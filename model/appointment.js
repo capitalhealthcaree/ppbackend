@@ -8,6 +8,8 @@ const appointmentSchema = mongoose.Schema(
     email: { type: String, required: true },
     patientType: { type: String, required: true },
     message: { type: String, required: true },
+    location: { type: String, required: true },
+
   },
   { timestamps: true }
 );

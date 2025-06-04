@@ -230,7 +230,8 @@ app.get("/chatId/get", async (req, res) => {
 //................................................Appointment............
 
 app.post("/appointment/create", async (req, res) => {
-  const { firstName, lastName, phone, email, patientType, message } = req.body;
+  const { firstName, lastName, phone, email, patientType, message, location } =
+    req.body;
 
   try {
     const appointment = await Appointment.create({
@@ -240,6 +241,7 @@ app.post("/appointment/create", async (req, res) => {
       email,
       patientType,
       message,
+      location,
     });
 
     res
@@ -281,6 +283,7 @@ app.post("/appointment/create", async (req, res) => {
         <p>Email : ${email}</p>
         <p>Category : ${patientType}</p>
         <p>Contact Number : ${phone}</p>
+         <p>Location : ${location}</p>
         <p>Message : ${message}</p>
       </body>
     </html>`,
