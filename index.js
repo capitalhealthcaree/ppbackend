@@ -401,22 +401,54 @@ app.get("/blogs/getByCategory", async (req, res) => {
 });
 
 // get single blog by slug
-app.get("/blogs/:category/:slug", async (req, res) => {
+app.get("/blogs/:category/:slug?", async (req, res) => {
   try {
-    let slugs = "/" + req.params.category + "/" + req.params.slug + "/";
-    const blog = await Blog.findOne({
-      category: req.params.category,
-      slug: slugs,
-    });
-    if (!blog) {
-      return res.status(404).json({ error: "Blogs not found" });
+    const { category, slug } = req.params;
+
+    let blog;
+
+    if (slug) {
+      // Case: /blogs/category/slug
+      const slugs = "/" + category + "/" + slug + "/";
+      blog = await Blog.findOne({
+        category: category,
+        slug: slugs,
+      });
+    } else {
+      // Case: /blogs/slug (no category)
+      const slugs = "/" + category + "/";
+      blog = await Blog.findOne({
+        slug: slugs,
+      });
     }
+
+    if (!blog) {
+      return res.status(404).json({ error: "Blog not found" });
+    }
+
     res.status(200).json({ data: blog });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message });
   }
 });
+
+// app.get("/blogs/:category/:slug", async (req, res) => {
+//   try {
+//     let slugs = "/" + req.params.category + "/" + req.params.slug + "/";
+//     const blog = await Blog.findOne({
+//       category: req.params.category,
+//       slug: slugs,
+//     });
+//     if (!blog) {
+//       return res.status(404).json({ error: "Blogs not found" });
+//     }
+//     res.status(200).json({ data: blog });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: error.message });
+//   }
+// });
 // create blog
 app.post("/blogs/create", async (req, res) => {
   try {

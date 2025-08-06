@@ -7,7 +7,7 @@ const blogSchema = mongoose.Schema(
     foucKW: { type: String, required: true },
     slug: { type: String, required: true },
     seoTitle: { type: Array, required: true },
-    category: { type: String, required: true },
+    category: { type: String },
     image: { type: String },
   },
   { timestamps: true }
