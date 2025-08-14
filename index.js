@@ -312,12 +312,10 @@ app.delete("/deleteAppointment/:appointmentId", async (req, res) => {
     let deleted = await Appointment.deleteOne({
       _id: new mongodb.ObjectId(req.params.appointmentId),
     });
-    res
-      .status(200)
-      .json({
-        data: deleted,
-        mesasge: "Specific Appointment deleted successfully",
-      });
+    res.status(200).json({
+      data: deleted,
+      mesasge: "Specific Appointment deleted successfully",
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -399,6 +397,34 @@ app.get("/blogs/getByCategory", async (req, res) => {
     res.status(500).json({ err: error.message });
   }
 });
+// get all blogs
+app.get("/blogs/getRecent", async (req, res) => {
+  try {
+    const result = await Blog.find()
+      .sort({ createdAt: -1 }) // newest first
+      .limit(20); // only 20 blogs
+    res
+      .status(200)
+      .json({ data: result, message: "Recent 20 blogs fetched successfully" });
+  } catch (error) {
+    res.status(500).json({ err: error.message });
+  }
+});
+
+app.get("/blogs/get17thRecent", async (req, res) => {
+  try {
+    const result = await Blog.find()
+      .sort({ createdAt: -1 }) // newest first
+      .skip(16) // skip first 16 blogs
+      .limit(1); // get only the 17th
+    res.status(200).json({
+      data: result[0],
+      message: "17th recent blog fetched successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ err: error.message });
+  }
+});
 
 // get single blog by slug
 app.get("/blogs/:category/:slug?", async (req, res) => {
@@ -406,21 +432,65 @@ app.get("/blogs/:category/:slug?", async (req, res) => {
     const { category, slug } = req.params;
 
     let blog;
+    console.log("categoryqqww", category);
+    console.log("slug999", slug);
+    const slugs = "/" + category + "/" + slug + "/";
+    console.log("slug))))", slugs);
 
-    if (slug) {
-      // Case: /blogs/category/slug
+    if (slug && category) {
+      console.log("Case1");
+
+      // Case: category exists
       const slugs = "/" + category + "/" + slug + "/";
       blog = await Blog.findOne({
-        category: category,
+        slug: slugs,
+      });
+    } else if (slug && category == "") {
+      console.log("Case2");
+
+      // Case: category is explicitly empty string
+      const slugs = "/" + slug + "/";
+      blog = await Blog.findOne({
         slug: slugs,
       });
     } else {
-      // Case: /blogs/slug (no category)
-      const slugs = "/" + category + "/";
-      blog = await Blog.findOne({
-        slug: slugs,
-      });
+      // Optional: handle no slug provided
+      blog = null;
     }
+    // if (slug && category) {
+    //   // Case: /blogs/category/slug
+    //   const slugs = "/" + category + "/" + slug + "/";
+    //   blog = await Blog.findOne({
+    //     category: category,
+    //     slug: slugs,
+    //   });
+    // } else if (slug && category === "") {
+    //   // Case: /blogs/slug (no category value, explicitly empty string)
+    //   const slugs = "/" + slug + "/";
+    //   blog = await Blog.findOne({
+    //     slug: slugs,
+    //   });
+    // } else {
+    //   // Case: /blogs/slug (category not provided at all)
+    //   const slugs = "/" + category + "/" + slug + "/";
+    //   blog = await Blog.findOne({
+    //     slug: slugs,
+    //   });
+    // }
+    // if (slug) {
+    //   // Case: /blogs/category/slug
+    //   const slugs = "/" + category + "/" + slug + "/";
+    //   blog = await Blog.findOne({
+    //     category: category,
+    //     slug: slugs,
+    //   });
+    // } else {
+    //   // Case: /blogs/slug (no category)
+    //   const slugs = "/" + category + "/";
+    //   blog = await Blog.findOne({
+    //     slug: slug,
+    //   });
+    // }
 
     if (!blog) {
       return res.status(404).json({ error: "Blog not found" });
