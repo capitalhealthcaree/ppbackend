@@ -444,7 +444,6 @@ app.get("/blogs/:category?/:slug?", async (req, res) => {
       // Case 1: /blogs/category/slug
       slugs = `/${category}/${slug}/`;
       blog = await Blog.findOne({
-        category,
         slug: slugs,
       });
 
