@@ -427,81 +427,117 @@ app.get("/blogs/get17thRecent", async (req, res) => {
 });
 
 // get single blog by slug
-app.get("/blogs/:category/:slug?", async (req, res) => {
+app.get("/blogs/:category?/:slug?", async (req, res) => {
   try {
-    const { category, slug } = req.params;
+    let { category, slug } = req.params;
 
     let blog;
-    console.log("categoryqqww", category);
-    console.log("slug999", slug);
-    const slugs = "/" + category + "/" + slug + "/";
-    console.log("slug))))", slugs);
+    let slugs;
+
+    // Normalize params: if no slug is given and category looks like a slug, shift them
+    if (!slug && category) {
+      slug = category;
+      category = "";
+    }
 
     if (slug && category) {
-      console.log("Case1");
+      // Case 1: /blogs/category/slug
+      slugs = `/${category}/${slug}/`;
+      blog = await Blog.findOne({
+        category,
+        slug: slugs,
+      });
 
-      // Case: category exists
-      const slugs = "/" + category + "/" + slug + "/";
+    } else if (slug && !category) {
+      // Case 2: /blogs/slug (category missing or empty)
+      slugs = `/${slug}/`;
       blog = await Blog.findOne({
         slug: slugs,
       });
-    } else if (slug && category == "") {
-      console.log("Case2");
-
-      // Case: category is explicitly empty string
-      const slugs = "/" + slug + "/";
-      blog = await Blog.findOne({
-        slug: slugs,
-      });
-    } else {
-      // Optional: handle no slug provided
-      blog = null;
     }
-    // if (slug && category) {
-    //   // Case: /blogs/category/slug
-    //   const slugs = "/" + category + "/" + slug + "/";
-    //   blog = await Blog.findOne({
-    //     category: category,
-    //     slug: slugs,
-    //   });
-    // } else if (slug && category === "") {
-    //   // Case: /blogs/slug (no category value, explicitly empty string)
-    //   const slugs = "/" + slug + "/";
-    //   blog = await Blog.findOne({
-    //     slug: slugs,
-    //   });
-    // } else {
-    //   // Case: /blogs/slug (category not provided at all)
-    //   const slugs = "/" + category + "/" + slug + "/";
-    //   blog = await Blog.findOne({
-    //     slug: slugs,
-    //   });
-    // }
-    // if (slug) {
-    //   // Case: /blogs/category/slug
-    //   const slugs = "/" + category + "/" + slug + "/";
-    //   blog = await Blog.findOne({
-    //     category: category,
-    //     slug: slugs,
-    //   });
-    // } else {
-    //   // Case: /blogs/slug (no category)
-    //   const slugs = "/" + category + "/";
-    //   blog = await Blog.findOne({
-    //     slug: slug,
-    //   });
-    // }
 
     if (!blog) {
       return res.status(404).json({ error: "Blog not found" });
     }
 
     res.status(200).json({ data: blog });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message });
   }
 });
+
+// app.get("/blogs/:category/:slug?", async (req, res) => {
+//   try {
+//     const { category, slug } = req.params;
+
+//     let blog;
+//     console.log("categoryqqww", category);
+//     console.log("slug999", slug);
+//     const slugs = "/" + category + "/" + slug + "/";
+//     console.log("slug))))", slugs);
+
+//     if (slug && !category) {
+//       console.log("Case1");
+
+//       // Case: category exists
+//       const slugs = "/" + category + "/" + slug + "/";
+//       blog = await Blog.findOne({
+//         slug: slugs,
+//       });
+//     } else if (slug && category === "") {
+//       const slugs = "/" + slug + "/";
+//       blog = await Blog.findOne({ slug: slugs });
+//     } else {
+//       // Optional: handle no slug provided
+//       blog = null;
+//     }
+//     // if (slug && category) {
+//     //   // Case: /blogs/category/slug
+//     //   const slugs = "/" + category + "/" + slug + "/";
+//     //   blog = await Blog.findOne({
+//     //     category: category,
+//     //     slug: slugs,
+//     //   });
+//     // } else if (slug && category === "") {
+//     //   // Case: /blogs/slug (no category value, explicitly empty string)
+//     //   const slugs = "/" + slug + "/";
+//     //   blog = await Blog.findOne({
+//     //     slug: slugs,
+//     //   });
+//     // } else {
+//     //   // Case: /blogs/slug (category not provided at all)
+//     //   const slugs = "/" + category + "/" + slug + "/";
+//     //   blog = await Blog.findOne({
+//     //     slug: slugs,
+//     //   });
+//     // }
+//     // if (slug) {
+//     //   // Case: /blogs/category/slug
+//     //   const slugs = "/" + category + "/" + slug + "/";
+//     //   blog = await Blog.findOne({
+//     //     category: category,
+//     //     slug: slugs,
+//     //   });
+//     // } else {
+//     //   // Case: /blogs/slug (no category)
+//     //   const slugs = "/" + category + "/";
+//     //   blog = await Blog.findOne({
+//     //     slug: slug,
+//     //   });
+//     // }
+
+//     if (!blog) {
+//       return res.status(404).json({ error: "Blog not found" });
+//     }
+
+//     res.status(200).json({ data: blog });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: error.message });
+//   }
+// });
 
 // app.get("/blogs/:category/:slug", async (req, res) => {
 //   try {
