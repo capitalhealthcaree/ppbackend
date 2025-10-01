@@ -411,6 +411,26 @@ app.get("/blogs/getRecent", async (req, res) => {
   }
 });
 
+// get blogs count and all slugs
+app.get("/blogs/allSlug", async (req, res) => {
+  try {
+    // count total blogs
+    const totalBlogs = await Blog.countDocuments();
+
+    // fetch only slugs
+    const slugs = await Blog.find({}, "slug -_id"); // only slug field, exclude _id
+
+    res.status(200).json({
+      total: totalBlogs,
+      slugs: slugs.map((b) => b.slug), // convert to simple array
+      message: "Blog count and slugs fetched successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ err: error.message });
+  }
+});
+
+
 app.get("/blogs/get17thRecent", async (req, res) => {
   try {
     const result = await Blog.find()
