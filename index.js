@@ -40,7 +40,7 @@ db.on("disconnected", (err, res) => {
 });
 
 app.get("/", async (req, res) => {
-  res.send("Welcome");
+  res.send("Welcome to PPC APis");
 });
 
 //......................... Assets ..........................
