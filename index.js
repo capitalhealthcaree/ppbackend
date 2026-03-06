@@ -28,7 +28,7 @@ app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(express.json());
 
 mongoose.connect(
-  "mongodb+srv://ppbackend:Web786786@healthcarecluster.yhawahg.mongodb.net/priemerpaindb?retryWrites=true&w=majority"
+  "mongodb+srv://ppbackend:Web786786@healthcarecluster.yhawahg.mongodb.net/priemerpaindb?retryWrites=true&w=majority",
 );
 const db = mongoose.connection;
 db.on("connected", () => {
@@ -209,7 +209,7 @@ app.patch("/chatId/update/:chatbotId", async (req, res) => {
         $set: {
           chatIdKey: req.body.chatIdKey,
         },
-      }
+      },
     );
 
     res.status(200).json({ mesasge: "Blog updated successfully" });
@@ -349,18 +349,26 @@ app.get("/blogs/getLastFive", async (req, res) => {
     res.status(500).json({ err: "error getting blogs" });
   }
 });
-// get all blogs by pagination
-app.get("/blogs/getAll/pagination", async (req, res) => {
-  const page = parseInt(req.query.page) || 1; // default to first page if page is not specified
-  const limit = parseInt(req.query.limit) || 9; // default to 10 documents per page if limit is not specified
-  const startIndex = (page - 1) * limit;
+// to show all blog with pagination  in website only not for dashbaord, no fetch blog content
 
+// get all blogs by pagination
+app.get("/blogs/getAllWithOutConten/pagination", async (req, res) => {
   try {
-    const totalDocs = await Blog.countDocuments();
-    const data = await Blog.find()
-      .sort({ _id: -1 })
-      .skip(startIndex)
-      .limit(limit);
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 9;
+    const skip = (page - 1) * limit;
+
+    const [totalDocs, data] = await Promise.all([
+      Blog.countDocuments(),
+      Blog.find({})
+        .sort({ _id: -1 })
+        .skip(skip)
+        .limit(limit)
+        .select("slug image seoTitle metaDes") // only required fields
+        .lean(), // faster response
+    ]);
+
+    res.set("Cache-Control", "public, max-age=300"); // cache 5 minutes
 
     res.status(200).json({
       currentPage: page,
@@ -368,7 +376,31 @@ app.get("/blogs/getAll/pagination", async (req, res) => {
       data,
     });
   } catch (err) {
-    res.status(500).json({ err: "getting some error" });
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// get all blogs by pagination
+app.get("/blogs/getAll/pagination", async (req, res) => {
+  try {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 9;
+    const skip = (page - 1) * limit;
+
+    const [totalDocs, data] = await Promise.all([
+      Blog.countDocuments(),
+      Blog.find({}).sort({ _id: -1 }).skip(skip).limit(limit).lean(), // faster response
+    ]);
+
+    res.set("Cache-Control", "public, max-age=300"); // cache 5 minutes
+
+    res.status(200).json({
+      currentPage: page,
+      totalPages: Math.ceil(totalDocs / limit),
+      data,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
   }
 });
 // get single blog by id
@@ -430,7 +462,6 @@ app.get("/blogs/allSlug", async (req, res) => {
   }
 });
 
-
 app.get("/blogs/get17thRecent", async (req, res) => {
   try {
     const result = await Blog.find()
@@ -466,7 +497,6 @@ app.get("/blogs/:category?/:slug?", async (req, res) => {
       blog = await Blog.findOne({
         slug: slugs,
       });
-
     } else if (slug && !category) {
       // Case 2: /blogs/slug (category missing or empty)
       slugs = `/${slug}/`;
@@ -480,7 +510,6 @@ app.get("/blogs/:category?/:slug?", async (req, res) => {
     }
 
     res.status(200).json({ data: blog });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message });
@@ -624,7 +653,7 @@ app.patch("/blogs/update/:blogId", async (req, res) => {
           category: req.body.category,
           image: req.body.image,
         },
-      }
+      },
     );
 
     res.status(200).json({ mesasge: "Blog updated successfully" });
@@ -722,7 +751,7 @@ app.patch("/news/update/:blogId", async (req, res) => {
           seoTitle: req.body.seoTitle,
           image: req.body.image,
         },
-      }
+      },
     );
 
     res.status(200).json({ mesasge: "News updated successfully" });
@@ -888,7 +917,7 @@ app.patch("/faq/update/:faqId", async (req, res) => {
           slug: req.body.slug,
           seoTitle: req.body.seoTitle,
         },
-      }
+      },
     );
 
     res.status(200).json({ mesasge: "Faq updated successfully" });
@@ -968,7 +997,7 @@ app.get("/countersDateWise", async (req, res) => {
         // Calculate overall total count for the date
         const overallTotalCount = totalCounts.reduce(
           (total, item) => total + item.totalCount,
-          0
+          0,
         );
 
         return {
@@ -976,7 +1005,7 @@ app.get("/countersDateWise", async (req, res) => {
           totalCounts,
           overallTotalCount,
         };
-      }
+      },
     );
 
     return res.status(200).json({ data: transformedData });
@@ -1075,7 +1104,7 @@ app.patch("/treatmentsUpdate/:treatmentsId", async (req, res) => {
           content: req.body.content,
           slug: req.body.slug,
         },
-      }
+      },
     );
     res.status(200).json({ mesasge: "treatments updated successfully" });
   } catch (error) {
